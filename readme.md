@@ -16,8 +16,7 @@
     
  2.运行程序，等待程序启动浏览器。  
   windows：运行main.exe    
-  UOS amd64：运行main  
-  UOS arm64：运行main/main
+  UOS：运行main  
     
  3.完成登录和选课。  
   
@@ -34,6 +33,7 @@
 3. arm架构的linux系统下，下载firefox和对应驱动程序放置于res文件夹中。（发行版已打包进去，可以直接下载发行版从其中拷贝。）
 4. 运行bin/main.py
 5. 按照发行版使用步骤3-5执行。
+
 
 
 
