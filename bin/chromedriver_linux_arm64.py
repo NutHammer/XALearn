@@ -17,6 +17,10 @@ def auto_chrome(web_address):
     if not os.path.exists(firefox_path):
         raise FileNotFoundError(f"找不到Firefox浏览器，请确保Firefox存在于 {firefox_path}")
     
+    # 创建持久化配置文件目录
+    profile_path = os.path.abspath(
+        os.path.join(os.path.dirname(__file__), "..", "res", "firefox", "profile")
+    )
     # 本地geckodriver驱动路径
     driver_path = os.path.abspath(
         os.path.join(os.path.dirname(__file__), "..", "res", "geckodriver")
@@ -35,12 +39,27 @@ def auto_chrome(web_address):
     # 指定Firefox二进制文件路径
     firefox_options.binary_location = firefox_path
     
+    # 使用持久化配置文件
+    if not os.path.exists(profile_path):
+        os.makedirs(profile_path)
+       
+    # 通过命令行参数指定配置文件路径
+    firefox_options.add_argument(f'--profile={profile_path}')
+    
     # 添加常用选项以提高兼容性
     firefox_options.add_argument('--no-sandbox')
     firefox_options.add_argument('--disable-dev-shm-usage')
     firefox_options.add_argument('--disable-gpu')
     firefox_options.add_argument('--no-first-run')
     firefox_options.add_argument('--no-default-browser-check')
+
+    # 设置自动播放偏好
+    firefox_options.set_preference("media.autoplay.default", 0)  # 0 = 允许所有自动播放
+    firefox_options.set_preference("media.autoplay.blocking_policy", 0)  # 0 = 不阻止自动播放
+    firefox_options.set_preference("media.autoplay.block-event.enabled", False)  # 允许自动播放事件
+    
+    # 设置静音偏好
+    firefox_options.set_preference("media.volume_scale", 0)  # 0 = 完全静音
     
     # 创建服务
     service = Service(executable_path=driver_path)
@@ -53,26 +72,3 @@ def auto_chrome(web_address):
     
     return driver
 
-
-def main():
-    try:
-        print("正在直接启动并驱动Firefox浏览器...")
-        driver = auto_chrome("https://www.sqgj.gov.cn/index")
-        print("Firefox浏览器已直接启动并连接成功")
-        
-        print("执行点击测试...")
-        # 根据实际网页结构调整选择器
-        elements = driver.find_elements(By.CLASS_NAME, "item")
-        if len(elements) > 2:
-            elements[2].click()
-            print("点击操作完成")
-        else:
-            print("未找到足够的item元素")
-            
-    except Exception as e:
-        print(f"程序执行出错: {e}")
-        sys.exit(1)
-
-
-if __name__ == "__main__":
-    main()
